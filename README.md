@@ -112,9 +112,3 @@ Exemplo:
   "status": "ok"
 }
 ```
-
----
-
-## 👨‍💻 Autor
-
-Kalel Costa
