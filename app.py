@@ -14,7 +14,9 @@ class Todo(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.id
 
-
+@app.route('/health')
+def health():
+    return {'status': 'ok'}
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
