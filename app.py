@@ -126,6 +126,5 @@ def update_user(id):
 
     return render_template('update_user.html',user=user)
 
-
 if __name__ == '__main__':  
     app.run(debug=True, host='0.0.0.0', port=5000)
