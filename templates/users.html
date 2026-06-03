@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Users</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+
+    <h1>Users</h1>
+
+    <form action="/users" method="POST">
+        <input type="text" name="name" placeholder="Nome" required>
+
+        <input type="email" name="email" placeholder="Email" required>
+
+        <input type="submit" value="Cadastrar">
+    </form>
+    {% if users|length < 1 %}
+    
+        <h4>Nenhum usuário cadastrado.</h4>
+    {% else %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <a href="/user/delete/{{ user.id }}">
+                        Delete
+                    </a>
+                    <br>
+                    <a href="/user/update/{{ user.id }}">
+                        Update
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% endif %}
+
+</div>
+{% endblock %}

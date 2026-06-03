@@ -14,6 +14,15 @@ class Todo(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.id
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<User {self.id}>'
+        
 @app.route('/health')
 def health():
     return {'status': 'ok'}
@@ -65,6 +74,57 @@ def update(id):
         
     else:
         return render_template('update.html', task=task)
+
+
+
+
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        new_user = User(name=name, email=email)
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect('/users')
+
+        except:
+            return 'Erro ao cadastrar usuário.'
+
+    else:
+        users = User.query.order_by(User.date_created).all()
+        return render_template('users.html', users=users)
+    
+@app.route('/user/delete/<int:id>')
+def delete_user(id):
+    user = User.query.get_or_404(id)
+    try:
+        db.session.delete(user)
+        db.session.commit()
+
+        return redirect('/users')
+
+    except:
+        return 'Erro ao excluir usuário.'
+    
+@app.route('/user/update/<int:id>', methods=['GET', 'POST'])
+def update_user(id):
+    user = User.query.get_or_404(id)
+    if request.method == 'POST':
+
+        user.name = request.form['name']
+        user.email = request.form['email']
+
+        try:
+            db.session.commit()
+            return redirect('/users')
+
+        except:
+            return 'Erro ao atualizar usuário.'
+
+    return render_template('update_user.html',user=user)
 
 
 if __name__ == '__main__':  
