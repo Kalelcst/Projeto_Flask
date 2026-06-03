@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>Users</title>
+<title>Usuários</title>
 {% endblock %}
 
 {% block body %}
 <div class="content">
 
-    <h1>Users</h1>
+    <h1>Usuários</h1>
 
     <form action="/users" method="POST">
         <input type="text" name="name" placeholder="Nome" required>
@@ -17,7 +17,7 @@
         <input type="submit" value="Cadastrar">
     </form>
     {% if users|length < 1 %}
-    
+
         <h4>Nenhum usuário cadastrado.</h4>
     {% else %}
 
