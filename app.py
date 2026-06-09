@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime  
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SECRET_KEY'] = 'minha-chave-super-secreta'
 db = SQLAlchemy(app)
 
 class Todo(db.Model):
@@ -25,6 +28,45 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.id}>'
         
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        token = request.headers.get('Authorization')
+
+        print("HEADER RECEBIDO:", token)
+
+        if not token:
+            return {'message': 'Token não fornecido'}, 401
+
+        try:
+            token = token.split(" ")[1]
+
+            data = jwt.decode(
+                token,
+                app.config['SECRET_KEY'],
+                algorithms=['HS256']
+            )
+
+            current_user = User.query.get(data['user_id'])
+
+        except Exception as e:
+            print("ERRO JWT:", e)
+            return {'message': str(e)}, 401
+
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+@app.route('/api/profile')
+@token_required
+def profile(current_user):
+
+    return {
+        'id': current_user.id,
+        'name': current_user.name,
+        'email': current_user.email
+    }
+
 
 @app.route('/health')
 def health():
@@ -91,7 +133,7 @@ def login():
             user.password,
             password
         ):
-            return f'Bem-vindo {user.name}!'
+            return f' {user.name}!'
 
         return 'Email ou senha inválidos.'
 
@@ -151,6 +193,36 @@ def update_user(id):
 
     return render_template('update_user.html',user=user)
 
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+
+    data = request.get_json()
+
+    email = data.get('email')
+    password = data.get('password')
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return {'message': 'Usuário não encontrado'}, 404
+
+    if not check_password_hash(
+        user.password,
+        password
+    ):
+        return {'message': 'Senha inválida'}, 401
+
+    token = jwt.encode(
+        {
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=1)
+        },
+        app.config['SECRET_KEY'],
+        algorithm='HS256'
+    )
+
+    return {'token': token}
 
 if __name__ == '__main__':  
     app.run(debug=True, host='0.0.0.0', port=5000)
