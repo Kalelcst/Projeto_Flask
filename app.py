@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime  
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -19,13 +20,16 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    password = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
         return f'<User {self.id}>'
         
+
 @app.route('/health')
 def health():
     return {'status': 'ok'}
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -44,7 +48,6 @@ def index():
     else:
         tasks = Todo.query.order_by(Todo.date_created).all()
         return render_template('index.html', tasks=tasks)
-    
 
 
 @app.route('/delete/<int:id>')
@@ -76,6 +79,23 @@ def update(id):
         return render_template('update.html', task=task)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(
+            user.password,
+            password
+        ):
+            return f'Bem-vindo {user.name}!'
+
+        return 'Email ou senha inválidos.'
+
+    return render_template('login.html')
 
 
 @app.route('/users', methods=['GET', 'POST'])
@@ -83,20 +103,24 @@ def users():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
-        new_user = User(name=name, email=email)
+        password = request.form['password']
+        hashed_password = generate_password_hash(password)
+        new_user = User(name=name, email=email, password=hashed_password)
 
         try:
             db.session.add(new_user)
             db.session.commit()
             return redirect('/users')
 
-        except:
-            return 'Erro ao cadastrar usuário.'
+        except Exception as e:
+            print(e)
+            return str(e)
 
     else:
         users = User.query.order_by(User.date_created).all()
         return render_template('users.html', users=users)
     
+
 @app.route('/user/delete/<int:id>')
 def delete_user(id):
     user = User.query.get_or_404(id)
@@ -109,6 +133,7 @@ def delete_user(id):
     except:
         return 'Erro ao excluir usuário.'
     
+
 @app.route('/user/update/<int:id>', methods=['GET', 'POST'])
 def update_user(id):
     user = User.query.get_or_404(id)
@@ -126,5 +151,8 @@ def update_user(id):
 
     return render_template('update_user.html',user=user)
 
+
 if __name__ == '__main__':  
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+    
