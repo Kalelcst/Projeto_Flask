@@ -15,6 +15,8 @@ class Todo(db.Model):
     content = db.Column(db.String(200), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
     def __repr__(self):
         return '<Task %r>' % self.id
 
@@ -24,6 +26,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(255), nullable=False)
+
+    tasks = db.relationship('Todo', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.id}>'
@@ -61,12 +65,50 @@ def token_required(f):
 @token_required
 def profile(current_user):
 
-    return {
-        'id': current_user.id,
-        'name': current_user.name,
-        'email': current_user.email
-    }
+    if not current_user:
+        return {'message': 'Usuário não encontrado'}, 404
+    
+    return {'id': current_user.id, 'name': current_user.name, 'email': current_user.email}
 
+@app.route('/api/tasks', methods=['POST'])
+@token_required
+def create_task(current_user):
+
+    data = request.get_json()
+
+    content = data.get('content')
+
+    if not content:
+        return {'message': 'Conteúdo obrigatório'}, 400
+
+    new_task = Todo(
+        content=content,
+        user_id=current_user.id
+    )
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return {
+        'message': 'Tarefa criada com sucesso',
+        'task_id': new_task.id
+    }, 201
+
+@app.route('/api/tasks', methods=['GET'])
+@token_required
+def get_tasks(current_user):
+
+    tasks = Todo.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
+    return [
+        {
+            'id': task.id,
+            'content': task.content
+        }
+        for task in tasks
+    ]
 
 @app.route('/health')
 def health():
@@ -77,7 +119,7 @@ def health():
 def index():
     if request.method == 'POST':
         task_content = request.form['content']
-        new_task = Todo(content=task_content)
+        new_task = Todo(content=task_content, user_id=1)
 
         try:
             db.session.add(new_task)
@@ -225,6 +267,8 @@ def api_login():
     return {'token': token}
 
 if __name__ == '__main__':  
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
 
     
