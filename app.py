@@ -44,15 +44,20 @@ def token_required(f):
             return {'message': 'Token não fornecido'}, 401
 
         try:
-            token = token.split(" ")[1]
+            parts = token.split()
+            if len(parts) != 2:
+                return {'message': 'Formato inválido'}, 401
+            token = parts[1]
 
             data = jwt.decode(
                 token,
                 app.config['SECRET_KEY'],
-                algorithms=['HS256']
-            )
+                algorithms=['HS256'])
 
             current_user = User.query.get(data['user_id'])
+
+            if not current_user:
+                return {'message': 'Usuário não encontrado'}, 404
 
         except Exception as e:
             print("ERRO JWT:", e)
@@ -109,6 +114,52 @@ def get_tasks(current_user):
         }
         for task in tasks
     ]
+
+@app.route('/api/tasks/<int:id>', methods=['PUT'])
+@token_required
+def update_task(current_user, id):
+
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=current_user.id
+    ).first()
+
+    if not task:
+        return {'message': 'Tarefa não encontrada'}, 404
+
+    data = request.get_json()
+
+    content = data.get('content')
+
+    if not content:
+        return {'message': 'Conteúdo obrigatório'}, 400
+
+    task.content = content
+
+    db.session.commit()
+
+    return {
+        'message': 'Tarefa atualizada com sucesso'
+    }
+
+@app.route('/api/tasks/<int:id>', methods=['DELETE'])
+@token_required
+def delete_task(current_user, id):
+
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=current_user.id
+    ).first()
+
+    if not task:
+        return {'message': 'Tarefa não encontrada'}, 404
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return {
+        'message': 'Tarefa excluída com sucesso'
+    }
 
 @app.route('/health')
 def health():
