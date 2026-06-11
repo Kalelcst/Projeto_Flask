@@ -1,32 +1,31 @@
-from flask import request
+from flask import Blueprint, request, current_app
 from datetime import datetime, timedelta
 import jwt
 from werkzeug.security import check_password_hash
 
-from app import app
-
-print("API APP ID:", id(app))
-
 from models import db, User, Todo
 from auth import token_required
 
+api = Blueprint('api', __name__, url_prefix='/api')
 
-@app.route('/api/profile')
+
+# PROFILE
+@api.route('/profile', methods=['GET'])
 @token_required
 def profile(current_user):
+    return {
+        'id': current_user.id,
+        'name': current_user.name,
+        'email': current_user.email
+    }
 
-    if not current_user:
-        return {'message': 'Usuário não encontrado'}, 404
-    
-    return {'id': current_user.id, 'name': current_user.name, 'email': current_user.email}
 
-
-@app.route('/api/tasks', methods=['POST'])
+# CREATE TASK
+@api.route('/tasks', methods=['POST'])
 @token_required
 def create_task(current_user):
 
     data = request.get_json()
-
     content = data.get('content')
 
     if not content:
@@ -46,7 +45,8 @@ def create_task(current_user):
     }, 201
 
 
-@app.route('/api/tasks', methods=['GET'])
+# GET TASKS
+@api.route('/tasks', methods=['GET'])
 @token_required
 def get_tasks(current_user):
 
@@ -63,7 +63,8 @@ def get_tasks(current_user):
     ]
 
 
-@app.route('/api/tasks/<int:id>', methods=['PUT'])
+# UPDATE TASK
+@api.route('/tasks/<int:id>', methods=['PUT'])
 @token_required
 def update_task(current_user, id):
 
@@ -76,22 +77,20 @@ def update_task(current_user, id):
         return {'message': 'Tarefa não encontrada'}, 404
 
     data = request.get_json()
-
     content = data.get('content')
 
     if not content:
         return {'message': 'Conteúdo obrigatório'}, 400
 
     task.content = content
-
     db.session.commit()
 
-    return {
-        'message': 'Tarefa atualizada com sucesso'
-    }
+    return {'message': 'Tarefa atualizada com sucesso'}
 
 
-@app.route('/api/tasks/<int:id>', methods=['DELETE'])
+
+# DELETE TASK
+@api.route('/tasks/<int:id>', methods=['DELETE'])
 @token_required
 def delete_task(current_user, id):
 
@@ -106,17 +105,19 @@ def delete_task(current_user, id):
     db.session.delete(task)
     db.session.commit()
 
-    return {
-        'message': 'Tarefa excluída com sucesso'
-    }
+    return {'message': 'Tarefa excluída com sucesso'}
 
 
-@app.route('/api/login', methods=['POST'])
+
+# LOGIN (JWT)
+@api.route('/login', methods=['POST'])
 def api_login():
+
     data = request.get_json()
+
     if not data:
         return {'message': 'JSON inválido'}, 400
-    
+
     email = data.get('email')
     password = data.get('password')
 
@@ -125,10 +126,7 @@ def api_login():
     if not user:
         return {'message': 'Usuário não encontrado'}, 404
 
-    if not check_password_hash(
-        user.password,
-        password
-    ):
+    if not check_password_hash(user.password, password):
         return {'message': 'Senha inválida'}, 401
 
     token = jwt.encode(
@@ -136,11 +134,8 @@ def api_login():
             'user_id': user.id,
             'exp': datetime.utcnow() + timedelta(hours=1)
         },
-        app.config['SECRET_KEY'],
+        current_app.config['SECRET_KEY'],
         algorithm='HS256'
     )
 
     return {'token': token}
-
-print("API ROTAS REGISTRADAS")
-print(app.url_map)

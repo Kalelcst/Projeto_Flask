@@ -1,7 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-db = SQLAlchemy()
+from extensions import db
 
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,6 +10,7 @@ class Todo(db.Model):
 
     def __repr__(self):
         return '<Task %r>' % self.id
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
