@@ -90,6 +90,7 @@ def delete_task(current_user, id):
 
 # LOGIN (JWT)
 @api.route('/login', methods=['POST'])
+@token_required
 def api_login():
 
     data = request.get_json()
