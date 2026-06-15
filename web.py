@@ -67,11 +67,7 @@ def users():
 
         hashed_password = generate_password_hash(password)
 
-        new_user = User(
-            name=name,
-            email=email,
-            password=hashed_password
-        )
+        new_user = User(name=name, email=email, password=hashed_password)
 
         try:
             db.session.add(new_user)

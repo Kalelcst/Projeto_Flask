@@ -22,11 +22,7 @@ def token_required(f):
 
             token = parts[1]
 
-            data = jwt.decode(
-                token,
-                current_app.config['SECRET_KEY'],
-                algorithms=['HS256']
-            )
+            data = jwt.decode( token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
 
             current_user = User.query.filter_by(id=data['user_id']).first()
 

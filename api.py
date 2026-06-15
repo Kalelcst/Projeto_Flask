@@ -13,11 +13,7 @@ api = Blueprint('api', __name__, url_prefix='/api')
 @api.route('/profile', methods=['GET'])
 @token_required
 def profile(current_user):
-    return {
-        'id': current_user.id,
-        'name': current_user.name,
-        'email': current_user.email
-    }
+    return {'id': current_user.id, 'name': current_user.name, 'email': current_user.email}
 
 
 # CREATE TASK
@@ -31,18 +27,12 @@ def create_task(current_user):
     if not content:
         return {'message': 'Conteúdo obrigatório'}, 400
 
-    new_task = Todo(
-        content=content,
-        user_id=current_user.id
-    )
+    new_task = Todo(content=content, user_id=current_user.id)
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {
-        'message': 'Tarefa criada com sucesso',
-        'task_id': new_task.id
-    }, 201
+    return {'message': 'Tarefa criada com sucesso', 'task_id': new_task.id}, 201
 
 
 # GET TASKS
@@ -50,17 +40,12 @@ def create_task(current_user):
 @token_required
 def get_tasks(current_user):
 
-    tasks = Todo.query.filter_by(
-        user_id=current_user.id
-    ).all()
+    tasks = Todo.query.filter_by(user_id=current_user.id).all()
 
     return [
-        {
-            'id': task.id,
-            'content': task.content
-        }
+        {'id': task.id, 'content': task.content}
         for task in tasks
-    ]
+]
 
 
 # UPDATE TASK
@@ -68,10 +53,7 @@ def get_tasks(current_user):
 @token_required
 def update_task(current_user, id):
 
-    task = Todo.query.filter_by(
-        id=id,
-        user_id=current_user.id
-    ).first()
+    task = Todo.query.filter_by(id=id, user_id=current_user.id).first()
 
     if not task:
         return {'message': 'Tarefa não encontrada'}, 404
@@ -94,10 +76,7 @@ def update_task(current_user, id):
 @token_required
 def delete_task(current_user, id):
 
-    task = Todo.query.filter_by(
-        id=id,
-        user_id=current_user.id
-    ).first()
+    task = Todo.query.filter_by(id=id, user_id=current_user.id).first()
 
     if not task:
         return {'message': 'Tarefa não encontrada'}, 404
@@ -132,8 +111,7 @@ def api_login():
     token = jwt.encode(
         {
             'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(hours=1)
-        },
+            'exp': datetime.utcnow() + timedelta(hours=1)},
         current_app.config['SECRET_KEY'],
         algorithm='HS256'
     )
