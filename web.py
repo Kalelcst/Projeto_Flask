@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import db, User, Todo
@@ -16,11 +16,16 @@ def index():
     if request.method == 'POST':
         task_content = request.form['content']
 
+        if not task_content.strip():
+            flash('A tarefa não pode ficar vazia.', 'danger')
+            return redirect('/')
+
         new_task = Todo(content=task_content, user_id=user_id)
 
         try:
             db.session.add(new_task)
             db.session.commit()
+            flash('Tarefa criada com sucesso!', 'success')
             return redirect('/')
         except Exception as e:
             print(e)
@@ -40,10 +45,16 @@ def update(id):
     task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
 
     if request.method == 'POST':
-        task.content = request.form['content']
+        content = request.form['content']
 
+        if not content.strip():
+            flash('A tarefa não pode ficar vazia.', 'danger')
+            return redirect(f'/update/{id}')
+
+        task.content = content
         try:
             db.session.commit()
+            flash('Tarefa atualizada com sucesso!', 'success')
             return redirect('/')
         except Exception as e:
             print(e)
@@ -68,9 +79,11 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.name
 
+            flash(f'Bem-vindo, {user.name}!', 'success')
             return redirect('/')
 
-        return 'Email ou senha inválidos.'
+        flash('Email ou senha inválidos.', 'danger')
+        return redirect('/login')
 
     return render_template('login.html')
 
@@ -79,14 +92,11 @@ def login():
 @login_required
 def users():
 
-    users = User.query.order_by(
-        User.date_created
-    ).all()
+    user_id = session.get('user_id')
 
-    return render_template(
-        'users.html',
-        users=users
-    )
+    user = User.query.get_or_404(user_id)
+
+    return render_template('users.html',users=[user])
 
 
 @web.route('/user/update/<int:id>', methods=['GET', 'POST'])
@@ -96,20 +106,40 @@ def update_user(id):
     user_id = session.get('user_id')
 
     if user_id != id:
-        return 'Acesso negado', 403
+        flash('Acesso negado.', 'danger')
+        return redirect('/users')
 
     user = User.query.get_or_404(id)
 
     if request.method == 'POST':
-        user.name = request.form['name']
-        user.email = request.form['email']
+
+        name = request.form['name']
+        email = request.form['email']
+
+        if not name.strip():
+            flash('Nome é obrigatório.', 'danger')
+            return redirect(f'/user/update/{id}')
+
+        if not email.strip():
+            flash('Email é obrigatório.', 'danger')
+            return redirect(f'/user/update/{id}')
+
+        existing_user = User.query.filter(User.email == email, User.id != id).first()
+
+        if existing_user:
+            flash('Este email já está em cadastrado!', 'danger')
+            return redirect(f'/user/update/{id}')
+
+        user.name = name
+        user.email = email
 
         try:
             db.session.commit()
+            flash('Usuário atualizado com sucesso!', 'success')
             return redirect('/users')
         except Exception as e:
             print(e)
-            return 'Ocorreu um problema ao atualizar sua tarefa.'
+            return 'Ocorreu um problema ao atualizar o usuário.'
 
     return render_template('update_user.html', user=user)
 
@@ -121,7 +151,8 @@ def delete_user(id):
     user_id = session.get('user_id')
 
     if user_id == id:
-        return 'Você não pode excluir sua própria conta.', 403
+        flash('Você não pode excluir sua própria conta.', 'danger')
+        return redirect('/users')
 
     return 'Funcionalidade reservada para administradores.', 403
 
@@ -137,16 +168,18 @@ def delete(id):
     try:
         db.session.delete(task_to_delete)
         db.session.commit()
+        flash('Tarefa excluída com sucesso!', 'success')
         return redirect('/')
     except Exception as e:
             print(e)
-            return 'Ocorreu um problema ao atualizar sua tarefa.'
+            return 'Ocorreu um problema ao excluir sua tarefa.'
 
 
 @web.route('/logout')
 @login_required
 def logout():
     session.clear()
+    flash('Logout realizado com sucesso.', 'info')
     return redirect('/login')
 
 @web.route('/register', methods=['GET', 'POST'])
@@ -154,17 +187,35 @@ def register():
 
     if session.get('user_id'):
         return redirect('/')
-
+    
     if request.method == 'POST':
 
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
 
+        if not name.strip():
+            flash('Nome é obrigatório.', 'danger')
+            return redirect('/register')
+
+        if not email.strip():
+            flash('Email é obrigatório.', 'danger')
+            return redirect('/register')
+
+
+        if len(password.strip()) < 6:
+            flash('A senha deve possuir pelo menos 6 caracteres.', 'danger')
+            return redirect('/register')
+
+        if not password.strip():
+            flash('Senha é obrigatória.', 'danger')
+            return redirect('/register')
+
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user:
-            return 'Email já cadastrado.'
+            flash('Este email já está cadastrado.', 'danger')
+            return redirect('/register')
 
         hashed_password = generate_password_hash(password)
 
@@ -178,6 +229,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
+            flash('Conta criada com sucesso! Faça login.', 'success')
             return redirect('/login')
 
         except Exception as e:
