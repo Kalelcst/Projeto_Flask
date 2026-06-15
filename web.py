@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import db, User, Todo
@@ -11,8 +11,12 @@ def index():
     if request.method == 'POST':
         task_content = request.form['content']
 
-        # TODO: substituir user_id=1 pelo usuário logado
-        new_task = Todo(content=task_content, user_id=1)
+        user_id = session.get('user_id')
+
+        if not user_id:
+            return redirect('/login')
+
+        new_task = Todo(content=task_content, user_id=user_id)
 
         try:
             db.session.add(new_task)
@@ -22,13 +26,24 @@ def index():
             return 'Ocorreu um problema ao adicionar sua tarefa.'
 
     else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect('/login')
+
+        tasks = Todo.query.filter_by(user_id=user_id).order_by(Todo.date_created).all()
+
         return render_template('index.html', tasks=tasks)
 
 
 @web.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    task = Todo.query.get_or_404(id)
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return redirect('/login')
+
+    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
 
     if request.method == 'POST':
         task.content = request.form['content']
@@ -51,7 +66,10 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password, password):
-            return f'{user.name}!'
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+
+            return redirect('/')
 
         return 'Email ou senha inválidos.'
 
@@ -112,7 +130,13 @@ def delete_user(id):
 
 @web.route('/delete/<int:id>')
 def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return redirect('/login')
+
+    task_to_delete = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
 
     try:
         db.session.delete(task_to_delete)
@@ -120,3 +144,9 @@ def delete(id):
         return redirect('/')
     except:
         return 'Ocorreu um problema ao excluir sua tarefa.'
+
+
+@web.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/login')
