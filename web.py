@@ -78,7 +78,8 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['user_name'] = user.name
-
+            session['is_admin'] = user.is_admin
+            
             flash(f'Bem-vindo, {user.name}!', 'success')
             return redirect('/')
 
@@ -280,3 +281,29 @@ def admin_dashboard():
         admin_users=admin_users
     )
 
+@web.route('/toggle-task/<int:id>')
+@login_required
+def toggle_task(id):
+
+    user_id = session.get('user_id')
+
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=user_id
+    ).first_or_404()
+
+    task.completed = not task.completed
+
+    try:
+        db.session.commit()
+
+        if task.completed:
+            flash('Tarefa concluída!', 'success')
+        else:
+            flash('Tarefa reaberta!', 'info')
+
+    except Exception as e:
+        print(e)
+        flash('Erro ao atualizar tarefa.', 'danger')
+
+    return redirect('/')

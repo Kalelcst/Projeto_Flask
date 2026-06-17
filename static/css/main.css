@@ -1,18 +1,20 @@
 body {
     margin: 0;
-    font-family: sans-serif;
-    background-color: #f4f4f4;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f6f9;
 }
 
 .content {
-    width: 50%;
+    width: 80%;
+    max-width: 1100px;
     margin: 0 auto;
-    padding-top: 50px;
+    padding-top: 40px;
 }
 
 h1 {
     text-align: center;
     color: #333;
+    margin-bottom: 30px;
 }
 
 h4 {
@@ -20,14 +22,44 @@ h4 {
     color: #777;
 }
 
+/* Flash messages */
+
+.alert {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Tabela */
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
     background-color: white;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #ddd;
 }
 
@@ -38,46 +70,120 @@ th {
 }
 
 td {
-    padding: 10px;
+    padding: 12px;
     text-align: center;
 }
 
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #f8f8f8;
 }
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status */
+
+.completed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.pending {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Links */
 
 a {
     text-decoration: none;
-    color: #439746;
+    color: #4CAF50;
     font-weight: bold;
 }
 
 a:hover {
-    color: #45a049;
+    color: #388e3c;
 }
 
+/* Formulário */
+
 .form {
-    margin-top: 20px;
+    margin-top: 30px;
     text-align: center;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="email"],
+input[type="password"] {
     width: 70%;
-    padding: 10px;
+    max-width: 500px;
+    padding: 12px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
 }
 
-input[type="submit"] {
-    padding: 10px 15px;
+input[type="submit"],
+button {
+    padding: 12px 20px;
     border: none;
     background-color: #4CAF50;
     color: white;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover,
+button:hover {
     background-color: #45a049;
 }
 
+/* Navegação */
+
+.navbar {
+    background-color: #333;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar a {
+    color: white;
+    margin-left: 15px;
+}
+
+.navbar a:hover {
+    color: #ddd;
+}
+
+
+.flash-container {
+    width: 80%;
+    max-width: 1100px;
+    margin: 20px auto;
+}
+
+.flash-message {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.flash-message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-message.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.flash-message.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}

@@ -10,11 +10,24 @@
 </head>
 <body>
 
+    {% if session.get('user_id') %}
+    <div class="navbar">
+        <a href="/">Tarefas</a>
+        <a href="/users">Perfil</a>
+
+        {% if session.get('is_admin') %}
+            <a href="/admin/users">Administração</a>
+        {% endif %}
+
+        <a href="/logout">Sair</a>
+    </div>
+    {% endif %}
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="flash-container">
+            <div class="content">
                 {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">
+                    <div class="alert {{ category }}">
                         {{ message }}
                     </div>
                 {% endfor %}
