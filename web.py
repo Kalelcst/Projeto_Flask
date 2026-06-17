@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import db, User, Todo
-from web_auth import login_required
+from web_auth import login_required, admin_required
 
 web = Blueprint('web', __name__)
 
@@ -203,12 +203,12 @@ def register():
             return redirect('/register')
 
 
-        if len(password.strip()) < 6:
-            flash('A senha deve possuir pelo menos 6 caracteres.', 'danger')
-            return redirect('/register')
-
         if not password.strip():
             flash('Senha é obrigatória.', 'danger')
+            return redirect('/register')
+
+        if len(password.strip()) < 6:
+            flash('A senha deve possuir pelo menos 6 caracteres.', 'danger')
             return redirect('/register')
 
         existing_user = User.query.filter_by(email=email).first()
@@ -237,3 +237,15 @@ def register():
             return str(e)
 
     return render_template('register.html')
+
+@web.route('/admin/users')
+@login_required
+@admin_required
+def admin_users():
+
+    users = User.query.all()
+
+    return render_template(
+        'admin_users.html',
+        users=users
+    )

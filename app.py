@@ -1,11 +1,12 @@
 from flask import Flask
 from models import db
+import secrets
 
 def create_app():
     app = Flask(__name__)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-    app.config['SECRET_KEY'] = 'minha-chave-super-secreta'
+    app.config['SECRET_KEY'] = secrets.token_hex(32)
 
     db.init_app(app)
 
