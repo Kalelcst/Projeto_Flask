@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Dashboard Administrativo</title>
+{% endblock %}
+
+{% block body %}
+
+<h1>Dashboard Administrativo</h1>
+
+<hr>
+
+<h2>Estatísticas Gerais</h2>
+
+<ul>
+    <li>Total de usuários: {{ total_users }}</li>
+    <li>Total de tarefas: {{ total_tasks }}</li>
+    <li>Tarefas concluídas: {{ completed_tasks }}</li>
+    <li>Tarefas pendentes: {{ pending_tasks }}</li>
+    <li>Administradores: {{ admin_users }}</li>
+</ul>
+
+<hr>
+
+<a href="/admin/users">Gerenciar Usuários</a>
+<br><br>
+<a href="/">Voltar para tarefas</a>
+
+{% endblock %}

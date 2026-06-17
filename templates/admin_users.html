@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Painel Administrativo</title>
+{% endblock %}
+
+{% block body %}
+
+<h1>Painel Administrativo</h1>
+
+<p>Total de usuários: {{ users|length }}</p>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Administrador</th>
+    </tr>
+
+    {% for user in users %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+            {% if user.is_admin %}
+                Sim
+            {% else %}
+                Não
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+
+<a href="/">Voltar para tarefas</a>
+
+{% endblock %}

@@ -249,3 +249,34 @@ def admin_users():
         'admin_users.html',
         users=users
     )
+
+@web.route('/admin/dashboard')
+@login_required
+@admin_required
+def admin_dashboard():
+
+    total_users = User.query.count()
+
+    total_tasks = Todo.query.count()
+
+    completed_tasks = Todo.query.filter_by(
+        completed=True
+    ).count()
+
+    pending_tasks = Todo.query.filter_by(
+        completed=False
+    ).count()
+
+    admin_users = User.query.filter_by(
+        is_admin=True
+    ).count()
+
+    return render_template(
+        'admin_dashboard.html',
+        total_users=total_users,
+        total_tasks=total_tasks,
+        completed_tasks=completed_tasks,
+        pending_tasks=pending_tasks,
+        admin_users=admin_users
+    )
+
