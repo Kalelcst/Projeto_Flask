@@ -26,7 +26,7 @@ class User(db.Model):
     
     is_admin = db.Column(db.Boolean, default=False)
 
-    tasks = db.relationship('Todo', backref='user', lazy=True)
+    tasks = db.relationship('Todo', backref='user', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<User {self.id}>'

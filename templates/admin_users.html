@@ -8,30 +8,55 @@
 
 <h1>Painel Administrativo</h1>
 
-<p>Total de usuários: {{ users|length }}</p>
+<p>Total de usuários: {{ users_data|length }}</p>
 
 <table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Administrador</th>
-    </tr>
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Email</th>
+            <th>Tarefas</th>
+            <th>Concluídas</th>
+            <th>Admin</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
 
-    {% for user in users %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-            {% if user.is_admin %}
-                Sim
-            {% else %}
-                Não
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
+    <tbody>
+        {% for item in users_data %}
+        <tr>
+            <td>{{ item.user.name }}</td>
+            <td>{{ item.user.email }}</td>
+            <td>{{ item.total_tasks }}</td>
+            <td>{{ item.completed_tasks }}</td>
+
+            <td>
+                {% if item.user.is_admin %}
+                    👑 Sim
+                {% else %}
+                    ❌ Não
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/admin/user/toggle-admin/{{ item.user.id }}">
+                    {% if item.user.is_admin %}
+                        Remover admin
+                    {% else %}
+                        Tornar admin
+                    {% endif %}
+                </a>
+
+                <br>
+
+                <a href="/admin/user/delete/{{ item.user.id }}"
+                   onclick="return confirm('Tem certeza que deseja excluir este usuário?')">
+                    Deletar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 <br>

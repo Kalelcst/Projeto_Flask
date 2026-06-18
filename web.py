@@ -246,9 +246,26 @@ def admin_users():
 
     users = User.query.all()
 
+    users_data = []
+
+    for user in users:
+
+        total_tasks = Todo.query.filter_by(user_id=user.id).count()
+
+        completed_tasks = Todo.query.filter_by(
+            user_id=user.id,
+            completed=True
+        ).count()
+
+        users_data.append({
+            'user': user,
+            'total_tasks': total_tasks,
+            'completed_tasks': completed_tasks
+        })
+
     return render_template(
         'admin_users.html',
-        users=users
+        users_data=users_data
     )
 
 @web.route('/admin/dashboard')
@@ -307,3 +324,56 @@ def toggle_task(id):
         flash('Erro ao atualizar tarefa.', 'danger')
 
     return redirect('/')
+
+@web.route('/admin/user/delete/<int:id>')
+@login_required
+@admin_required
+def admin_delete_user(id):
+
+    user = User.query.get_or_404(id)
+
+    user_id = session.get('user_id')
+
+    if user.id == user_id:
+        flash('Você não pode excluir sua própria conta.', 'danger')
+        return redirect('/admin/users')
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash('Usuário deletado com sucesso!', 'success')
+        return redirect('/admin/users')
+
+    except Exception as e:
+        print(e)
+        flash('Erro ao deletar usuário.', 'danger')
+        return redirect('/admin/users')
+    
+@web.route('/admin/user/toggle-admin/<int:id>')
+@login_required
+@admin_required
+def toggle_admin(id):
+
+    user = User.query.get_or_404(id)
+
+    user_id = session.get('user_id')
+
+    if user.id == user_id:
+        flash('Você não pode alterar seu próprio status de admin.', 'danger')
+        return redirect('/admin/users')
+
+    user.is_admin = not user.is_admin
+
+    try:
+        db.session.commit()
+
+        if user.is_admin:
+            flash('Usuário promovido a admin!', 'success')
+        else:
+            flash('Admin removido com sucesso!', 'info')
+
+    except Exception as e:
+        print(e)
+        flash('Erro ao atualizar usuário.', 'danger')
+
+    return redirect('/admin/users')
