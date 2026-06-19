@@ -13,6 +13,15 @@ def index():
 
     user_id = session.get('user_id')
 
+    search = request.args.get('search')
+
+    query = Todo.query.filter_by(user_id=user_id)
+
+    if search:
+        query = query.filter(Todo.content.contains(search))
+
+    tasks = query.order_by(Todo.date_created).all()
+
     if request.method == 'POST':
         task_content = request.form['content']
 
@@ -20,20 +29,15 @@ def index():
             flash('A tarefa não pode ficar vazia.', 'danger')
             return redirect('/')
 
-        new_task = Todo(content=task_content, user_id=user_id)
+        new_task = Todo(content=task_content, user_id=user_id, status='todo')
 
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            flash('Tarefa criada com sucesso!', 'success')
-            return redirect('/')
-        except Exception as e:
-            print(e)
-            return 'Ocorreu um problema ao adicionar sua tarefa.'
+        db.session.add(new_task)
+        db.session.commit()
 
-    tasks = Todo.query.filter_by(user_id=user_id).order_by(Todo.date_created).all()
+        flash('Tarefa criada com sucesso!', 'success')
+        return redirect('/')
 
-    return render_template('index.html', tasks=tasks)
+    return render_template('index.html', tasks=tasks, search=search)
 
 
 @web.route('/update/<int:id>', methods=['GET', 'POST'])
@@ -377,3 +381,22 @@ def toggle_admin(id):
         flash('Erro ao atualizar usuário.', 'danger')
 
     return redirect('/admin/users')
+
+@web.route('/move-task/<int:id>/<string:status>')
+@login_required
+def move_task(id, status):
+
+    user_id = session.get('user_id')
+
+    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
+
+    if status not in ['todo', 'doing', 'done']:
+        flash('Status inválido.', 'danger')
+        return redirect('/')
+
+    task.status = status
+
+    db.session.commit()
+
+    flash('Tarefa movida com sucesso!', 'success')
+    return redirect('/')

@@ -8,69 +8,28 @@
 
 <div class="content">
 
-    <h1>Controlador de Tarefas</h1>
+    <h1>📋 Controlador de Tarefas</h1>
 
-    {% if tasks|length < 1 %}
+    <!-- Busca -->
+    <form method="GET" action="/">
+        <input
+            type="text"
+            name="search"
+            placeholder="Buscar tarefas..."
+            value="{{ search or '' }}"
+        >
 
-        <h4>Não há tarefas cadastradas.</h4>
+        <button type="submit">
+            Buscar
+        </button>
+    </form>
 
-    {% else %}
+    <br>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Tarefa</th>
-                <th>Status</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for task in tasks %}
-            <tr>
-                <td>{{ task.content }}</td>
-
-                <td>
-                    {% if task.completed %}
-                        ✅ Concluída
-                    {% else %}
-                        ⏳ Pendente
-                    {% endif %}
-                </td>
-
-                <td>{{ task.date_created.strftime('%d/%m/%Y %H:%M') }}</td>
-
-                <td>
-                    <a href="/toggle-task/{{ task.id }}">
-                        {% if task.completed %}
-                            Reabrir
-                        {% else %}
-                            Concluir
-                        {% endif %}
-                    </a>
-
-                    <br><br>
-
-                    <a href="/update/{{ task.id }}">
-                        Atualizar
-                    </a>
-
-                    <br><br>
-
-                    <a href="/delete/{{ task.id }}">
-                        Deletar
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    {% endif %}
-
+    <!-- Nova tarefa -->
     <div class="form">
         <form action="/" method="POST">
+
             <input
                 type="text"
                 name="content"
@@ -82,8 +41,134 @@
                 type="submit"
                 value="Adicionar Tarefa"
             >
+
         </form>
     </div>
+
+    <br>
+
+    {% if tasks|length < 1 %}
+
+        <h4>Não há tarefas cadastradas.</h4>
+
+    {% else %}
+
+    <div class="kanban">
+
+        <!-- A FAZER -->
+        <div class="column">
+
+            <h2>🟡 A Fazer</h2>
+
+            {% for task in tasks if task.status == 'todo' %}
+
+            <div class="card">
+
+                <p>{{ task.content }}</p>
+
+                <small>
+                    {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/doing">
+                    ➡ Iniciar
+                </a>
+
+                <br>
+
+                <a href="/update/{{ task.id }}">
+                    ✏ Editar
+                </a>
+
+                <br>
+
+                <a href="/delete/{{ task.id }}">
+                    🗑 Excluir
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- FAZENDO -->
+        <div class="column">
+
+            <h2>🔵 Fazendo</h2>
+
+            {% for task in tasks if task.status == 'doing' %}
+
+            <div class="card">
+
+                <p>{{ task.content }}</p>
+
+                <small>
+                    {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/todo">
+                    ⬅ Voltar
+                </a>
+
+                <br>
+
+                <a href="/move-task/{{ task.id }}/done">
+                    ✅ Concluir
+                </a>
+
+                <br>
+
+                <a href="/update/{{ task.id }}">
+                    ✏ Editar
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- CONCLUÍDO -->
+        <div class="column">
+
+            <h2>🟢 Concluído</h2>
+
+            {% for task in tasks if task.status == 'done' %}
+
+            <div class="card">
+
+                <p>{{ task.content }}</p>
+
+                <small>
+                    {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/todo">
+                    ↩ Reabrir
+                </a>
+
+                <br>
+
+                <a href="/delete/{{ task.id }}">
+                    🗑 Excluir
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
 
 </div>
 
