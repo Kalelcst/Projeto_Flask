@@ -258,7 +258,7 @@ def admin_users():
 
         completed_tasks = Todo.query.filter_by(
             user_id=user.id,
-            completed=True
+            status='done'
         ).count()
 
         users_data.append({
@@ -281,12 +281,16 @@ def admin_dashboard():
 
     total_tasks = Todo.query.count()
 
-    completed_tasks = Todo.query.filter_by(
-        completed=True
+    todo_tasks = Todo.query.filter_by(
+        status='todo'
     ).count()
 
-    pending_tasks = Todo.query.filter_by(
-        completed=False
+    doing_tasks = Todo.query.filter_by(
+        status='doing'
+    ).count()
+
+    done_tasks = Todo.query.filter_by(
+        status='done'
     ).count()
 
     admin_users = User.query.filter_by(
@@ -297,8 +301,9 @@ def admin_dashboard():
         'admin_dashboard.html',
         total_users=total_users,
         total_tasks=total_tasks,
-        completed_tasks=completed_tasks,
-        pending_tasks=pending_tasks,
+        todo_tasks=todo_tasks,
+        doing_tasks=doing_tasks,
+        done_tasks=done_tasks,
         admin_users=admin_users
     )
 
@@ -388,9 +393,14 @@ def move_task(id, status):
 
     user_id = session.get('user_id')
 
-    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=user_id
+    ).first_or_404()
 
-    if status not in ['todo', 'doing', 'done']:
+    valid_status = ['todo', 'doing', 'done']
+
+    if status not in valid_status:
         flash('Status inválido.', 'danger')
         return redirect('/')
 
@@ -398,5 +408,6 @@ def move_task(id, status):
 
     db.session.commit()
 
-    flash('Tarefa movida com sucesso!', 'success')
+    flash('Tarefa atualizada!', 'success')
+
     return redirect('/')
