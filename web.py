@@ -13,14 +13,16 @@ def index():
 
     user_id = session.get('user_id')
 
-    search = request.args.get('search')
+    search = request.args.get('search', '').strip()
+    status = request.args.get('status')
 
     query = Todo.query.filter_by(user_id=user_id)
 
     if search:
-        query = query.filter(Todo.content.contains(search))
+        query = query.filter(Todo.content.ilike(f"%{search}%"))
 
-    tasks = query.order_by(Todo.date_created).all()
+    if status in ['todo', 'doing', 'done']:
+        query = query.filter(Todo.status == status)
 
     if request.method == 'POST':
         task_content = request.form['content']
@@ -318,7 +320,7 @@ def toggle_task(id):
         user_id=user_id
     ).first_or_404()
 
-    task.completed = not task.completed
+    task.status = 'done' if task.status != 'done' else 'todo'   
 
     try:
         db.session.commit()
