@@ -10,12 +10,34 @@ class Todo(db.Model):
     status = db.Column(
         db.String(20),
         default='todo'
-)
+    )
 
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    priority = db.Column(
+        db.String(20),
+        nullable=False,
+        default='media'
+    )
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date_created = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=False
+    )
+
+    def __repr__(self):
+        return f'<Todo {self.id}>'
+
 
 
 class User(db.Model):
@@ -25,6 +47,12 @@ class User(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(255), nullable=False)
     
+    status = db.Column(
+    db.String(20),
+    nullable=False,
+    default='todo'
+)
+
     is_admin = db.Column(db.Boolean, default=False)
 
     tasks = db.relationship('Todo', backref='user', lazy=True, cascade='all, delete-orphan')

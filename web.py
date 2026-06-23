@@ -39,6 +39,8 @@ def index():
         flash('Tarefa criada com sucesso!', 'success')
         return redirect('/')
 
+    tasks = query.order_by(Todo.date_created.desc()).all()
+
     return render_template('index.html', tasks=tasks, search=search)
 
 
@@ -309,33 +311,6 @@ def admin_dashboard():
         admin_users=admin_users
     )
 
-@web.route('/toggle-task/<int:id>')
-@login_required
-def toggle_task(id):
-
-    user_id = session.get('user_id')
-
-    task = Todo.query.filter_by(
-        id=id,
-        user_id=user_id
-    ).first_or_404()
-
-    task.status = 'done' if task.status != 'done' else 'todo'   
-
-    try:
-        db.session.commit()
-
-        if task.completed:
-            flash('Tarefa concluída!', 'success')
-        else:
-            flash('Tarefa reaberta!', 'info')
-
-    except Exception as e:
-        print(e)
-        flash('Erro ao atualizar tarefa.', 'danger')
-
-    return redirect('/')
-
 @web.route('/admin/user/delete/<int:id>')
 @login_required
 @admin_required
@@ -406,6 +381,7 @@ def move_task(id, status):
         flash('Status inválido.', 'danger')
         return redirect('/')
 
+    
     task.status = status
 
     db.session.commit()
