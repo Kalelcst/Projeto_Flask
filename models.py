@@ -3,12 +3,14 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
 
     status = db.Column(
         db.String(20),
+        nullable=False,
         default='todo'
     )
 
@@ -39,23 +41,21 @@ class Todo(db.Model):
         return f'<Todo {self.id}>'
 
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(255), nullable=False)
-    
-    status = db.Column(
-    db.String(20),
-    nullable=False,
-    default='todo'
-)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
     is_admin = db.Column(db.Boolean, default=False)
 
-    tasks = db.relationship('Todo', backref='user', lazy=True, cascade='all, delete-orphan')
+    tasks = db.relationship(
+        'Todo',
+        backref='user',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
         return f'<User {self.id}>'
