@@ -1,16 +1,20 @@
 {% extends 'base.html' %}
 
 {% block head %}
+
 <title>Painel Administrativo</title>
 {% endblock %}
 
 {% block body %}
 
+<div class="content">
+
+```
 <h1>Painel Administrativo</h1>
 
 <p>Total de usuários: {{ users_data|length }}</p>
 
-<table border="1">
+<table>
     <thead>
         <tr>
             <th>Usuário</th>
@@ -47,7 +51,7 @@
                     {% endif %}
                 </a>
 
-                <br>
+                <br><br>
 
                 <a href="/admin/user/delete/{{ item.user.id }}"
                    onclick="return confirm('Tem certeza que deseja excluir este usuário?')">
@@ -61,6 +65,10 @@
 
 <br>
 
+<a href="/admin/dashboard">Ver dashboard</a>
+<br><br>
 <a href="/">Voltar para tarefas</a>
+```
 
+</div>
 {% endblock %}

@@ -1,17 +1,34 @@
-<div class="form">
-    <form action="/user/update/{{ user.id }}" method="POST">
+{% extends "base.html" %}
 
-        <div class="form-row">
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" value="{{ user.name }}" placeholder="Digite o nome" required>
-        </div>
+{% block head %}
+<title>Atualizar Usuário</title>
+{% endblock %}
 
-        <div class="form-row">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="Digite o email" required>
-        </div>
+{% block body %}
+<div class="content">
 
-        <input type="submit" value="Atualizar">
+    <h1>Atualizar Perfil</h1>
 
-    </form>
+    <div class="form">
+        <form action="/user/update/{{ user.id }}" method="POST">
+
+            <div class="form-row">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}" placeholder="Digite o nome" required>
+            </div>
+
+            <div class="form-row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="Digite o email" required>
+            </div>
+
+            <input type="submit" value="Atualizar">
+
+        </form>
+    </div>
+
+    <br>
+    <a href="/users">Voltar</a>
+
 </div>
+{% endblock %}

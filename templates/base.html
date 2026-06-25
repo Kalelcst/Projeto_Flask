@@ -16,7 +16,8 @@
         <a href="/users">Perfil</a>
 
         {% if session.get('is_admin') %}
-            <a href="/admin/users">Administração</a>
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/users">Usuários</a>
         {% endif %}
 
         <a href="/logout">Sair</a>
