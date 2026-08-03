@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Atualizar Tarefa</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+
+    <h1 class="title">Atualizar tarefa</h1>
+
+    <div class="form">
+        <form action="/update/{{ task.id }}" method="POST">
+
+            <label for="content">Tarefa:</label>
+            <input
+                type="text"
+                name="content"
+                id="content"
+                value="{{ task.content }}"
+                placeholder="Digite a tarefa"
+                required
+            >
+
+            <label for="priority">Prioridade:</label>
+            <select name="priority" id="priority" required>
+                <option value="baixa" {% if task.priority == 'baixa' %}selected{% endif %}>Baixa</option>
+                <option value="media" {% if task.priority == 'media' %}selected{% endif %}>Média</option>
+                <option value="alta" {% if task.priority == 'alta' %}selected{% endif %}>Alta</option>
+            </select>
+
+            <input type="submit" value="Atualizar">
+        </form>
+    </div>
+
+</div>
+{% endblock %}

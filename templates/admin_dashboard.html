@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Dashboard Administrativo</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+
+```
+<h1>📊 Dashboard Administrativo</h1>
+
+<div class="dashboard-grid">
+
+    <div class="card">
+        <h3>👥 Usuários</h3>
+        <p>{{ total_users }}</p>
+    </div>
+
+    <div class="card">
+        <h3>📝 Tarefas</h3>
+        <p>{{ total_tasks }}</p>
+    </div>
+
+    <div class="card">
+        <h3>📌 A Fazer</h3>
+        <p>{{ todo_tasks }}</p>
+    </div>
+
+    <div class="card">
+        <h3>⚙️ Em Progresso</h3>
+        <p>{{ doing_tasks }}</p>
+    </div>
+
+    <div class="card">
+        <h3>✅ Concluídas</h3>
+        <p>{{ done_tasks }}</p>
+    </div>
+
+    <div class="card">
+        <h3>👑 Admins</h3>
+        <p>{{ admin_users }}</p>
+    </div>
+
+</div>
+
+<br>
+
+<a href="/admin/users">Gerenciar Usuários</a>
+<br><br>
+<a href="/">Voltar</a>
+```
+
+</div>
+{% endblock %}

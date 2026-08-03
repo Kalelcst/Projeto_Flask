@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    {% if session.get('user_id') %}
+    <div class="navbar">
+        <a href="/">Tarefas</a>
+        <a href="/users">Perfil</a>
+
+        {% if session.get('is_admin') %}
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/users">Usuários</a>
+        {% endif %}
+
+        <a href="/logout">Sair</a>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="content">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+
+</body>
+</html>

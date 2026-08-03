@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Meu Perfil</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+
+```
+<h1>Meu Perfil</h1>
+
+{% if users|length > 0 %}
+    {% set user = users[0] %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Administrador</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_admin %}
+                        👑 Sim
+                    {% else %}
+                        ❌ Não
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/user/update/{{ user.id }}">Atualizar perfil</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endif %}
+
+<br>
+<a href="/">Voltar para tarefas</a>
+```
+
+</div>
+{% endblock %}

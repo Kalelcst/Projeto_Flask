@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Controlador de Tarefas</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+
+<h1>📋 Controlador de Tarefas</h1>
+
+<!-- Busca -->
+<form method="GET" action="/" class="search-form">
+    <input
+        type="text"
+        name="search"
+        placeholder="Buscar tarefas..."
+        value="{{ search or '' }}"
+    >
+
+    <button type="submit">Buscar</button>
+</form>
+
+<br>
+
+<!-- Nova tarefa -->
+<div class="form">
+    <form action="/" method="POST">
+
+        <input
+            type="text"
+            name="content"
+            placeholder="Digite uma tarefa"
+            required
+        >
+
+        <select name="priority" required>
+            <option value="baixa">Baixa</option>
+            <option value="media" selected>Média</option>
+            <option value="alta">Alta</option>
+        </select>
+
+        <input type="submit" value="Adicionar Tarefa">
+
+    </form>
+</div>
+
+<br>
+
+{% if not tasks %}
+    <h4>Não há tarefas cadastradas.</h4>
+{% else %}
+
+<div class="kanban">
+
+    <!-- A FAZER -->
+    <div class="column">
+        <h2>🟡 A Fazer</h2>
+
+        {% for task in tasks %}
+            {% if task.status == 'todo' %}
+            <div class="card">
+                <p><strong>{{ task.content }}</strong></p>
+
+                <small>
+                    {% if task.priority == 'alta' %}
+                        🔴 Prioridade Alta
+                    {% elif task.priority == 'media' %}
+                        🟡 Prioridade Média
+                    {% else %}
+                        🟢 Prioridade Baixa
+                    {% endif %}
+                </small>
+
+                <br>
+
+                <small>
+                    {% if task.date_created %}
+                        {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                    {% endif %}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/doing">➡ Iniciar</a><br>
+                <a href="/update/{{ task.id }}">✏ Editar</a><br>
+                <a href="/delete/{{ task.id }}">🗑 Excluir</a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- FAZENDO -->
+    <div class="column">
+        <h2>🔵 Fazendo</h2>
+
+        {% for task in tasks %}
+            {% if task.status == 'doing' %}
+            <div class="card">
+                <p><strong>{{ task.content }}</strong></p>
+
+                <small>
+                    {% if task.priority == 'alta' %}
+                        🔴 Prioridade Alta
+                    {% elif task.priority == 'media' %}
+                        🟡 Prioridade Média
+                    {% else %}
+                        🟢 Prioridade Baixa
+                    {% endif %}
+                </small>
+
+                <br>
+
+                <small>
+                    {% if task.date_created %}
+                        {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                    {% endif %}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/todo">⬅ Voltar</a><br>
+                <a href="/move-task/{{ task.id }}/done">✅ Concluir</a><br>
+                <a href="/update/{{ task.id }}">✏ Editar</a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- CONCLUÍDO -->
+    <div class="column">
+        <h2>🟢 Concluído</h2>
+
+        {% for task in tasks %}
+            {% if task.status == 'done' %}
+            <div class="card">
+                <p><strong>{{ task.content }}</strong></p>
+
+                <small>
+                    {% if task.priority == 'alta' %}
+                        🔴 Prioridade Alta
+                    {% elif task.priority == 'media' %}
+                        🟡 Prioridade Média
+                    {% else %}
+                        🟢 Prioridade Baixa
+                    {% endif %}
+                </small>
+
+                <br>
+
+                <small>
+                    {% if task.date_created %}
+                        {{ task.date_created.strftime('%d/%m/%Y %H:%M') }}
+                    {% endif %}
+                </small>
+
+                <br><br>
+
+                <a href="/move-task/{{ task.id }}/todo">↩ Reabrir</a><br>
+                <a href="/delete/{{ task.id }}">🗑 Excluir</a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

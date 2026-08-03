@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<title>Painel Administrativo</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+
+```
+<h1>Painel Administrativo</h1>
+
+<p>Total de usuários: {{ users_data|length }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Email</th>
+            <th>Tarefas</th>
+            <th>Concluídas</th>
+            <th>Admin</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in users_data %}
+        <tr>
+            <td>{{ item.user.name }}</td>
+            <td>{{ item.user.email }}</td>
+            <td>{{ item.total_tasks }}</td>
+            <td>{{ item.completed_tasks }}</td>
+
+            <td>
+                {% if item.user.is_admin %}
+                    👑 Sim
+                {% else %}
+                    ❌ Não
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/admin/user/toggle-admin/{{ item.user.id }}">
+                    {% if item.user.is_admin %}
+                        Remover admin
+                    {% else %}
+                        Tornar admin
+                    {% endif %}
+                </a>
+
+                <br><br>
+
+                <a href="/admin/user/delete/{{ item.user.id }}"
+                   onclick="return confirm('Tem certeza que deseja excluir este usuário?')">
+                    Deletar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+
+<a href="/admin/dashboard">Ver dashboard</a>
+<br><br>
+<a href="/">Voltar para tarefas</a>
+```
+
+</div>
+{% endblock %}
