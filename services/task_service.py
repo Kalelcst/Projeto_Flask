@@ -33,6 +33,7 @@ def update_task(task, content):
 
 new_task = Todo(
     content=content,
+    content=content,
     user_id=user_id
 )
 
