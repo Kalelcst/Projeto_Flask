@@ -77,10 +77,8 @@ def update_user(id):
     )
 
 
-# ======================================
-# EXCLUIR A PRÓPRIA CONTA
-# ======================================
-@user.route("/user/delete/<int:id>")
+
+@user.route("/user/delete/<int:id>", methods=["POST"])
 @login_required
 def delete_user(id):
 

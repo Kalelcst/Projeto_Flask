@@ -28,6 +28,7 @@
 <!-- Nova tarefa -->
 <div class="form">
     <form action="/" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <input
             type="text"
@@ -84,9 +85,18 @@
 
                 <br><br>
 
-                <a href="/move-task/{{ task.id }}/doing">➡ Iniciar</a><br>
-                <a href="/update/{{ task.id }}">✏ Editar</a><br>
-                <a href="/delete/{{ task.id }}">🗑 Excluir</a>
+                <form action="/move-task/{{ task.id }}/doing" method="POST" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">➡ Iniciar</button>
+                </form>
+                <br>
+                <a href="/update/{{ task.id }}">✏ Editar</a>
+                <br>
+                <form action="/delete/{{ task.id }}" method="POST" style="display:inline"
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">🗑 Excluir</button>
+                </form>
             </div>
             {% endif %}
         {% endfor %}
@@ -121,9 +131,23 @@
 
                 <br><br>
 
-                <a href="/move-task/{{ task.id }}/todo">⬅ Voltar</a><br>
-                <a href="/move-task/{{ task.id }}/done">✅ Concluir</a><br>
+                <form action="/move-task/{{ task.id }}/todo" method="POST" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">⬅ Voltar</button>
+                </form>
+                <br>
+                <form action="/move-task/{{ task.id }}/done" method="POST" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">✅ Concluir</button>
+                </form>
+                <br>
                 <a href="/update/{{ task.id }}">✏ Editar</a>
+                <br>
+                <form action="/delete/{{ task.id }}" method="POST" style="display:inline"
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">🗑 Excluir</button>
+                </form>
             </div>
             {% endif %}
         {% endfor %}
@@ -158,8 +182,16 @@
 
                 <br><br>
 
-                <a href="/move-task/{{ task.id }}/todo">↩ Reabrir</a><br>
-                <a href="/delete/{{ task.id }}">🗑 Excluir</a>
+                <form action="/move-task/{{ task.id }}/todo" method="POST" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">↩ Reabrir</button>
+                </form>
+                <br>
+                <form action="/delete/{{ task.id }}" method="POST" style="display:inline"
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">🗑 Excluir</button>
+                </form>
             </div>
             {% endif %}
         {% endfor %}

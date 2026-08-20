@@ -72,10 +72,7 @@ def users():
     )
 
 
-# =========================
-# Excluir usuário
-# =========================
-@admin.route("/admin/user/delete/<int:id>")
+@admin.route("/admin/user/delete/<int:id>", methods=["POST"])
 @login_required
 @admin_required
 def delete_user(id):
@@ -100,10 +97,7 @@ def delete_user(id):
     return redirect("/admin/users")
 
 
-# =========================
-# Tornar / remover admin
-# =========================
-@admin.route("/admin/user/toggle-admin/<int:id>")
+@admin.route("/admin/user/toggle-admin/<int:id>", methods=["POST"])
 @login_required
 @admin_required
 def toggle_admin(id):

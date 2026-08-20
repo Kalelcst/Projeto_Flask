@@ -90,50 +90,26 @@ def update(id):
     )
 
 
-# ======================================
-# EXCLUIR
-# ======================================
-@task.route("/delete/<int:id>")
+@task.route("/delete/<int:id>", methods=["POST"])
 @login_required
 def delete(id):
-
     user_id = session.get("user_id")
-
-    task = Todo.query.filter_by(
-        id=id,
-        user_id=user_id
-    ).first_or_404()
-
+    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
     db.session.delete(task)
     db.session.commit()
-
     flash("Tarefa excluída com sucesso!", "success")
-
     return redirect("/")
 
 
-# ======================================
-# MOVER NO KANBAN
-# ======================================
-@task.route("/move-task/<int:id>/<status>")
+@task.route("/move-task/<int:id>/<status>", methods=["POST"])
 @login_required
 def move_task(id, status):
-
     user_id = session.get("user_id")
-
     if status not in ["todo", "doing", "done"]:
         flash("Status inválido.", "danger")
         return redirect("/")
-
-    task = Todo.query.filter_by(
-        id=id,
-        user_id=user_id
-    ).first_or_404()
-
+    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
     task.status = status
-
     db.session.commit()
-
     flash("Status atualizado!", "success")
-
     return redirect("/")
