@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 from werkzeug.security import check_password_hash
 
@@ -45,7 +45,7 @@ def get_tasks(current_user):
     return [
         {'id': task.id, 'content': task.content}
         for task in tasks
-]
+    ]
 
 
 # UPDATE TASK
@@ -70,7 +70,6 @@ def update_task(current_user, id):
     return {'message': 'Tarefa atualizada com sucesso'}
 
 
-
 # DELETE TASK
 @api.route('/tasks/<int:id>', methods=['DELETE'])
 @token_required
@@ -85,7 +84,6 @@ def delete_task(current_user, id):
     db.session.commit()
 
     return {'message': 'Tarefa excluída com sucesso'}
-
 
 
 # LOGIN (JWT)
@@ -108,7 +106,8 @@ def api_login():
     token = jwt.encode(
         {
             'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(hours=1)},
+            'exp': datetime.now(timezone.utc) + timedelta(hours=1)
+        },
         current_app.config['SECRET_KEY'],
         algorithm='HS256'
     )
