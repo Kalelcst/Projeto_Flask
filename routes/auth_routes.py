@@ -1,14 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, session, flash
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
-from models import db, User
+from services.user_service import UserService
 
 auth = Blueprint("auth", __name__)
 
-
-# =========================
-# Login
-# =========================
 @auth.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -20,7 +16,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        user = User.query.filter_by(email=email).first()
+        user = UserService.get_by_email(email)
 
         if user and check_password_hash(user.password, password):
 
@@ -37,9 +33,6 @@ def login():
     return render_template("login.html")
 
 
-# =========================
-# Cadastro
-# =========================
 @auth.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -71,20 +64,13 @@ def register():
             )
             return redirect("/register")
 
-        existing_user = User.query.filter_by(email=email).first()
+        existing_user = UserService.get_by_email(email)
 
         if existing_user:
             flash("Este email já está cadastrado.", "danger")
             return redirect("/register")
 
-        new_user = User(
-            name=name,
-            email=email,
-            password=generate_password_hash(password)
-        )
-
-        db.session.add(new_user)
-        db.session.commit()
+        UserService.create_user(name, email, password)
 
         flash(
             "Conta criada com sucesso! Faça login.",
@@ -96,9 +82,6 @@ def register():
     return render_template("register.html")
 
 
-# =========================
-# Logout
-# =========================
 @auth.route("/logout")
 def logout():
 

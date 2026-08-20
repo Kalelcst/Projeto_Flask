@@ -1,14 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, session, flash
 
-from models import db, User
+from models import User
 from web_auth import login_required
+from services.user_service import UserService
 
 user = Blueprint("user", __name__)
 
 
-# ======================================
-# PERFIL
-# ======================================
 @user.route("/users")
 @login_required
 def users():
@@ -22,10 +20,6 @@ def users():
         users=[user]
     )
 
-
-# ======================================
-# EDITAR PERFIL
-# ======================================
 @user.route("/user/update/<int:id>", methods=["GET", "POST"])
 @login_required
 def update_user(id):
@@ -60,10 +54,7 @@ def update_user(id):
             flash("Este email já está cadastrado.", "danger")
             return redirect(f"/user/update/{id}")
 
-        user.name = name
-        user.email = email
-
-        db.session.commit()
+        UserService.update_profile(user, name, email)
 
         session["user_name"] = user.name
 
@@ -75,7 +66,6 @@ def update_user(id):
         "update_user.html",
         user=user
     )
-
 
 
 @user.route("/user/delete/<int:id>", methods=["POST"])
@@ -90,8 +80,7 @@ def delete_user(id):
 
     user = User.query.get_or_404(id)
 
-    db.session.delete(user)
-    db.session.commit()
+    UserService.delete_user(user)
 
     session.clear()
 

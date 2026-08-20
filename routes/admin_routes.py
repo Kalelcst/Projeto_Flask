@@ -1,45 +1,30 @@
 from flask import Blueprint, render_template, redirect, flash, session
 
-from models import db, User, Todo
+from models import User, Todo
 from web_auth import login_required, admin_required
+from services.admin_service import AdminService
 
 admin = Blueprint("admin", __name__)
 
 
-# =========================
-# Dashboard
-# =========================
 @admin.route("/admin/dashboard")
 @login_required
 @admin_required
 def dashboard():
 
-    total_users = User.query.count()
-
-    total_tasks = Todo.query.count()
-
-    todo_tasks = Todo.query.filter_by(status="todo").count()
-
-    doing_tasks = Todo.query.filter_by(status="doing").count()
-
-    done_tasks = Todo.query.filter_by(status="done").count()
-
-    admin_users = User.query.filter_by(is_admin=True).count()
+    stats = AdminService.get_dashboard_stats()
 
     return render_template(
         "admin_dashboard.html",
-        total_users=total_users,
-        total_tasks=total_tasks,
-        todo_tasks=todo_tasks,
-        doing_tasks=doing_tasks,
-        done_tasks=done_tasks,
-        admin_users=admin_users
+        total_users=stats["total_users"],
+        total_tasks=stats["total_tasks"],
+        todo_tasks=stats["todo_tasks"],
+        doing_tasks=stats["doing_tasks"],
+        done_tasks=stats["done_tasks"],
+        admin_users=stats["admin_users"]
     )
 
 
-# =========================
-# Lista de usuários
-# =========================
 @admin.route("/admin/users")
 @login_required
 @admin_required
@@ -86,8 +71,7 @@ def delete_user(id):
         )
         return redirect("/admin/users")
 
-    db.session.delete(user)
-    db.session.commit()
+    AdminService.delete_user(user)
 
     flash(
         "Usuário excluído com sucesso!",
@@ -111,9 +95,7 @@ def toggle_admin(id):
         )
         return redirect("/admin/users")
 
-    user.is_admin = not user.is_admin
-
-    db.session.commit()
+    AdminService.toggle_admin(user)
 
     if user.is_admin:
         flash(
