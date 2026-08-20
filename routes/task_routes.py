@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, session, flash
-from sqlalchemy import or_
 
-from models import db, Todo
+from models import Todo
 from web_auth import login_required
+from services.task_service import TaskService
 
 task = Blueprint("task", __name__)
 
@@ -19,18 +19,13 @@ def index():
     if request.method == "POST":
 
         content = request.form["content"].strip()
+        priority = request.form.get("priority", "media")
 
         if not content:
             flash("A tarefa não pode ficar vazia.", "danger")
             return redirect("/")
 
-        new_task = Todo(
-            content=content,
-            user_id=user_id
-        )
-
-        db.session.add(new_task)
-        db.session.commit()
+        TaskService.create_task(user_id, content, priority)
 
         flash("Tarefa criada com sucesso!", "success")
 
@@ -71,14 +66,13 @@ def update(id):
     if request.method == "POST":
 
         content = request.form["content"].strip()
+        priority = request.form.get("priority", task.priority)
 
         if not content:
             flash("A tarefa não pode ficar vazia.", "danger")
             return redirect(f"/update/{id}")
 
-        task.content = content
-
-        db.session.commit()
+        TaskService.update_task(task, content, priority)
 
         flash("Tarefa atualizada com sucesso!", "success")
 
@@ -90,26 +84,47 @@ def update(id):
     )
 
 
+# ======================================
+# EXCLUIR
+# ======================================
 @task.route("/delete/<int:id>", methods=["POST"])
 @login_required
 def delete(id):
+
     user_id = session.get("user_id")
-    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
-    db.session.delete(task)
-    db.session.commit()
+
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=user_id
+    ).first_or_404()
+
+    TaskService.delete_task(task)
+
     flash("Tarefa excluída com sucesso!", "success")
+
     return redirect("/")
 
 
+# ======================================
+# MOVER NO KANBAN
+# ======================================
 @task.route("/move-task/<int:id>/<status>", methods=["POST"])
 @login_required
 def move_task(id, status):
+
     user_id = session.get("user_id")
+
     if status not in ["todo", "doing", "done"]:
         flash("Status inválido.", "danger")
         return redirect("/")
-    task = Todo.query.filter_by(id=id, user_id=user_id).first_or_404()
-    task.status = status
-    db.session.commit()
+
+    task = Todo.query.filter_by(
+        id=id,
+        user_id=user_id
+    ).first_or_404()
+
+    TaskService.move_task(task, status)
+
     flash("Status atualizado!", "success")
+
     return redirect("/")

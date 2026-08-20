@@ -4,11 +4,12 @@ from models import db, Todo
 class TaskService:
 
     @staticmethod
-    def create_task(user_id, content):
+    def create_task(user_id, content, priority='media'):
 
         task = Todo(
             content=content,
-            user_id=user_id
+            user_id=user_id,
+            priority=priority
         )
 
         db.session.add(task)
@@ -16,31 +17,29 @@ class TaskService:
 
         return task
 
-@staticmethod
-def delete_task(task):
+    @staticmethod
+    def update_task(task, content, priority=None):
 
-    db.session.delete(task)
-    db.session.commit()
+        task.content = content
 
-@staticmethod
-def update_task(task, content):
+        if priority is not None:
+            task.priority = priority
 
-    task.content = content
+        db.session.commit()
 
-    db.session.commit()
+        return task
 
-    return task
+    @staticmethod
+    def delete_task(task):
 
-new_task = Todo(
-    content=content,
-    content=content,
-    user_id=user_id
-)
+        db.session.delete(task)
+        db.session.commit()
 
-db.session.add(new_task)
-db.session.commit()
+    @staticmethod
+    def move_task(task, status):
 
-TaskService.create_task(
-    user_id,
-    content
-)
+        task.status = status
+
+        db.session.commit()
+
+        return task

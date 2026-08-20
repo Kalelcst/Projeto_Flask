@@ -102,11 +102,8 @@ def api_login():
 
     user = User.query.filter_by(email=email).first()
 
-    if not user:
-        return {'message': 'Usuário não encontrado'}, 404
-
-    if not check_password_hash(user.password, password):
-        return {'message': 'Senha inválida'}, 401
+    if not user or not check_password_hash(user.password, password):
+        return {'message': 'Credenciais inválidas'}, 401
 
     token = jwt.encode(
         {

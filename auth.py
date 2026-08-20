@@ -10,8 +10,6 @@ def token_required(f):
 
         token = request.headers.get('Authorization')
 
-        print("HEADER RECEBIDO:", token)
-
         if not token:
             return {'message': 'Token não fornecido'}, 401
 
