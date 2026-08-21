@@ -11,6 +11,7 @@
 
     <div class="form">
         <form action="/update/{{ task.id }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <label for="content">Tarefa:</label>
             <input
