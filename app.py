@@ -20,7 +20,7 @@ def get_or_create_secret_key(app):
             "SECRET_KEY não definida. Configure a variável de ambiente "
             "SECRET_KEY antes de rodar em produção."
         )
-    
+
     os.makedirs(app.instance_path, exist_ok=True)
     key_path = os.path.join(app.instance_path, "secret_key")
 
@@ -40,6 +40,9 @@ def create_app():
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
     app.config["SECRET_KEY"] = get_or_create_secret_key(app)
+    app.config["SESSION_COOKIE_SECURE"] = os.environ.get("FLASK_ENV") == "production"
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
     db.init_app(app)
     migrate.init_app(app, db)
