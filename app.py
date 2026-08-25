@@ -5,6 +5,8 @@ import secrets
 from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
 
+from config import config_by_name
+
 csrf = CSRFProtect()
 migrate = Migrate()
 
@@ -15,7 +17,7 @@ def get_or_create_secret_key(app):
     if env_key:
         return env_key
 
-    if os.environ.get("FLASK_ENV") == "production":
+    if app.config.get("ENV_NAME") == "production":
         raise RuntimeError(
             "SECRET_KEY não definida. Configure a variável de ambiente "
             "SECRET_KEY antes de rodar em produção."
@@ -35,14 +37,14 @@ def get_or_create_secret_key(app):
     return key
 
 
-def create_app():
+def create_app(env_name=None):
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+    env_name = env_name or os.environ.get("FLASK_ENV", "development")
+    app.config.from_object(config_by_name[env_name])
+    app.config["ENV_NAME"] = env_name
+
     app.config["SECRET_KEY"] = get_or_create_secret_key(app)
-    app.config["SESSION_COOKIE_SECURE"] = os.environ.get("FLASK_ENV") == "production"
-    app.config["SESSION_COOKIE_HTTPONLY"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
     db.init_app(app)
     migrate.init_app(app, db)

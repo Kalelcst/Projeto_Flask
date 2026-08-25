@@ -9,6 +9,17 @@ def utcnow():
 
 
 class Todo(db.Model):
+    __table_args__ = (
+        db.CheckConstraint(
+            "status IN ('todo', 'doing', 'done')",
+            name="ck_todo_status_valido"
+        ),
+        db.CheckConstraint(
+            "priority IN ('baixa', 'media', 'alta')",
+            name="ck_todo_priority_valido"
+        ),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
 
