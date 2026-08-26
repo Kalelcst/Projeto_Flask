@@ -1,19 +1,73 @@
 from flask import Blueprint, request, current_app
 from datetime import datetime, timedelta, timezone
+import logging
 import jwt
 from werkzeug.security import check_password_hash
 
 from models import db, User, Todo
 from auth import token_required
 
+logger = logging.getLogger(__name__)
+
 api = Blueprint('api', __name__, url_prefix='/api')
+
+VALID_PRIORITIES = ('baixa', 'media', 'alta')
+MAX_CONTENT_LENGTH = 200
+
+
+# Helpers de validação
+def get_json_body():
+    return request.get_json(silent=True)
+
+
+def validate_content(data):
+    content = data.get('content')
+
+    if content is None:
+        return None, 'Campo "content" é obrigatório'
+
+    if not isinstance(content, str):
+        return None, 'Campo "content" deve ser texto'
+
+    content = content.strip()
+
+    if not content:
+        return None, 'Campo "content" não pode ficar vazio'
+
+    if len(content) > MAX_CONTENT_LENGTH:
+        return None, f'Campo "content" deve ter no máximo {MAX_CONTENT_LENGTH} caracteres'
+
+    return content, None
+
+
+def validate_priority(data):
+    if 'priority' not in data:
+        return None, None
+
+    priority = data.get('priority')
+
+    if priority not in VALID_PRIORITIES:
+        return None, f'Campo "priority" deve ser um de: {", ".join(VALID_PRIORITIES)}'
+
+    return priority, None
+
+
+# Tratamento de erro do blueprint
+@api.errorhandler(Exception)
+def handle_unexpected_error(e):
+    logger.exception("Erro inesperado na API")
+    return {'message': 'Erro interno no servidor'}, 500
 
 
 # PROFILE
 @api.route('/profile', methods=['GET'])
 @token_required
 def profile(current_user):
-    return {'id': current_user.id, 'name': current_user.name, 'email': current_user.email}
+    return {
+        'id': current_user.id,
+        'name': current_user.name,
+        'email': current_user.email
+    }
 
 
 # CREATE TASK
@@ -21,18 +75,32 @@ def profile(current_user):
 @token_required
 def create_task(current_user):
 
-    data = request.get_json()
-    content = data.get('content')
+    data = get_json_body()
 
-    if not content:
-        return {'message': 'Conteúdo obrigatório'}, 400
+    if data is None:
+        return {'message': 'JSON inválido ou ausente'}, 400
 
-    new_task = Todo(content=content, user_id=current_user.id)
+    content, error = validate_content(data)
+    if error:
+        return {'message': error}, 400
+
+    priority, error = validate_priority(data)
+    if error:
+        return {'message': error}, 400
+
+    new_task = Todo(
+        content=content,
+        user_id=current_user.id,
+        priority=priority or 'media'
+    )
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {'message': 'Tarefa criada com sucesso', 'task_id': new_task.id}, 201
+    return {
+        'message': 'Tarefa criada com sucesso',
+        'task_id': new_task.id
+    }, 201
 
 
 # GET TASKS
@@ -43,7 +111,12 @@ def get_tasks(current_user):
     tasks = Todo.query.filter_by(user_id=current_user.id).all()
 
     return [
-        {'id': task.id, 'content': task.content}
+        {
+            'id': task.id,
+            'content': task.content,
+            'status': task.status,
+            'priority': task.priority
+        }
         for task in tasks
     ]
 
@@ -58,13 +131,24 @@ def update_task(current_user, id):
     if not task:
         return {'message': 'Tarefa não encontrada'}, 404
 
-    data = request.get_json()
-    content = data.get('content')
+    data = get_json_body()
 
-    if not content:
-        return {'message': 'Conteúdo obrigatório'}, 400
+    if data is None:
+        return {'message': 'JSON inválido ou ausente'}, 400
+
+    content, error = validate_content(data)
+    if error:
+        return {'message': error}, 400
+
+    priority, error = validate_priority(data)
+    if error:
+        return {'message': error}, 400
 
     task.content = content
+
+    if priority:
+        task.priority = priority
+
     db.session.commit()
 
     return {'message': 'Tarefa atualizada com sucesso'}
@@ -90,13 +174,19 @@ def delete_task(current_user, id):
 @api.route('/login', methods=['POST'])
 def api_login():
 
-    data = request.get_json()
+    data = get_json_body()
 
-    if not data:
-        return {'message': 'JSON inválido'}, 400
+    if data is None:
+        return {'message': 'JSON inválido ou ausente'}, 400
 
     email = data.get('email')
     password = data.get('password')
+
+    if not email or not isinstance(email, str):
+        return {'message': 'Email é obrigatório'}, 400
+
+    if not password or not isinstance(password, str):
+        return {'message': 'Senha é obrigatória'}, 400
 
     user = User.query.filter_by(email=email).first()
 
