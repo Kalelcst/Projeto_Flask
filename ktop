@@ -1,0 +1,20 @@
+[33m5a3718c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #1 from Kalelcst/Main
+[33m03fde93[m commit for desktop
+[33m7521368[m alteração parcial .py
+[33m2abb099[m update CSS
+[33m2367734[m correção HTMLs
+[33m8f96cb4[m kanban
+[33m9ef417c[m melhorias de filtos
+[33mc1cc560[m melhorando kanban
+[33m5107538[m dashboards estilo Trello
+[33ma0e2510[m dashboards de admin
+[33mab14e46[m atualização de html e css das pgs
+[33mf549eee[m html para adm e dashboards para adms
+[33m25eb9c8[m criando rotas de adm
+[33mf748a73[m estuturação
+[33m431fe44[m rotas atualizada por segurança
+[33mb1ebcf6[m proteção de tarefas
+[33ma3dc639[m proteção de rotas privadas JSON
+[33m2c58a6c[m ajuste de identação
+[33mdf4748b[m remoção do extension.py, e ajustes de adaptação
+[33m4f311f1[m correção do glitch mais fullweb codado da historia e ainda dando erro (estou entrando em delírio)
