@@ -1,9 +1,21 @@
 import os
 
 
+def get_database_url():
+    url = os.environ.get("DATABASE_URL")
+
+    if not url:
+        return "sqlite:///test.db"
+
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
+    return url
+
+
 class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///test.db")
+    SQLALCHEMY_DATABASE_URI = get_database_url()
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
