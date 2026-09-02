@@ -43,40 +43,42 @@ Aplicação web de gerenciamento de tarefas com quadro **Kanban**, autenticaçã
 
 O projeto segue o padrão **Application Factory** com separação em camadas:
 
-├── app.py # Application Factory
-├── config.py # Configurações por ambiente (dev/prod/test)
-├── models.py # Models SQLAlchemy (User, Todo)
-├── auth.py # Autenticação JWT (decorator para API)
-├── web_auth.py # Autenticação de sessão (decorators para web)
-├── api.py # Blueprint da API REST
-├── make_admin.py # Script CLI para promover um usuário a admin
+```
+├── app.py                     # Application Factory
+├── config.py                  # Configurações por ambiente (dev/prod/test)
+├── models.py                  # Models SQLAlchemy (User, Todo)
+├── auth.py                    # Autenticação JWT (decorator para API)
+├── web_auth.py                # Autenticação de sessão (decorators para web)
+├── api.py                     # Blueprint da API REST
+├── make_admin.py              # Script CLI para promover um usuário a admin
 │
-├── routes/ # Blueprints das rotas web
-│ ├── auth_routes.py # Login, cadastro, logout
-│ ├── task_routes.py # CRUD e Kanban de tarefas
-│ ├── user_routes.py # Perfil do usuário
-│ └── admin_routes.py # Painel administrativo
+├── routes/                    # Blueprints das rotas web
+│   ├── auth_routes.py         # Login, cadastro, logout
+│   ├── task_routes.py         # CRUD e Kanban de tarefas
+│   ├── user_routes.py         # Perfil do usuário
+│   └── admin_routes.py        # Painel administrativo
 │
-├── services/ # Regras de negócio (camada de serviço)
-│ ├── task_service.py
-│ ├── user_service.py
-│ └── admin_service.py
+├── services/                  # Regras de negócio (camada de serviço)
+│   ├── task_service.py
+│   ├── user_service.py
+│   └── admin_service.py
 │
-├── migrations/ # Versionamento do banco (Flask-Migrate)
+├── migrations/                # Versionamento do banco (Flask-Migrate)
 │
-├── tests/ # Suíte de testes automatizados (Pytest)
-│ ├── conftest.py # Fixtures compartilhadas
-│ ├── test_auth_web.py
-│ ├── test_tasks_web.py
-│ ├── test_user_web.py
-│ ├── test_admin.py
-│ └── test_api.py
+├── tests/                     # Suíte de testes automatizados (Pytest)
+│   ├── conftest.py            # Fixtures compartilhadas
+│   ├── test_auth_web.py
+│   ├── test_tasks_web.py
+│   ├── test_user_web.py
+│   ├── test_admin.py
+│   └── test_api.py
 │
-├── templates/ # Views Jinja2
-├── static/css/ # Estilos
+├── templates/                 # Views Jinja2
+├── static/css/                # Estilos
 │
-├── requirements.txt # Dependências de produção
-└── requirements-dev.txt # Dependências de desenvolvimento (testes)
+├── requirements.txt           # Dependências de produção
+└── requirements-dev.txt       # Dependências de desenvolvimento (testes)
+```
 
 ---
 
@@ -174,6 +176,7 @@ Todas as rotas da API estão sob o prefixo `/api` e retornam JSON. As rotas prot
 ```
 Authorization: Bearer <token>
 ```
+
 ### Autenticação
 
 **`POST /api/login`**
