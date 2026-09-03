@@ -240,30 +240,35 @@ tr:hover {
     margin-bottom: 10px;
 }
 
-.card form {
-    display: block;
-    width: 100%;
-    margin-bottom: 8px;
+.card {
+    display: flex;
+    flex-direction: column;
 }
 
-.card form button {
-    width: 100%;
-}
-
+.card form,
 .card > a {
-    display: block;
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 8px auto;
+}
+
+.card form button,
+.card > a {
+    width: 140px;
     box-sizing: border-box;
-    padding: 12px 20px;
-    margin-bottom: 8px;
+    padding: 10px 16px;
     background-color: #4CAF50;
     color: white;
     border-radius: 6px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
 }
 
+.card form button:hover,
 .card > a:hover {
     background-color: #45a049;
     color: white;
