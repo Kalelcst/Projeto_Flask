@@ -1,6 +1,3 @@
-/* =========================
-   BASE
-========================= */
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
@@ -34,9 +31,6 @@ h4 {
     color: #777;
 }
 
-/* =========================
-   NAVBAR
-========================= */
 .navbar {
     background-color: #333;
     padding: 15px 30px;
@@ -56,9 +50,6 @@ h4 {
     color: #ddd;
 }
 
-/* =========================
-   ALERTAS / FLASH
-========================= */
 .alert {
     padding: 12px;
     margin-bottom: 15px;
@@ -87,9 +78,6 @@ h4 {
     color: #856404;
 }
 
-/* =========================
-   LINKS
-========================= */
 a {
     text-decoration: none;
     color: #4CAF50;
@@ -100,9 +88,6 @@ a:hover {
     color: #388e3c;
 }
 
-/* =========================
-   FORMULÁRIOS
-========================= */
 .form {
     margin-top: 20px;
     text-align: center;
@@ -162,7 +147,6 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Busca */
 .search-form {
     display: flex;
     justify-content: center;
@@ -179,9 +163,6 @@ button:hover {
     max-width: 100%;
 }
 
-/* =========================
-   TABELAS
-========================= */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -211,9 +192,6 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
-/* =========================
-   KANBAN
-========================= */
 .kanban {
     display: flex;
     gap: 20px;
@@ -262,15 +240,35 @@ tr:hover {
     margin-bottom: 10px;
 }
 
-.card a {
-    display: inline-block;
-    margin-bottom: 6px;
-    font-size: 14px;
+.card form {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
 }
 
-/* =========================
-   DASHBOARD ADMIN
-========================= */
+.card form button {
+    width: 100%;
+}
+
+.card > a {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+}
+
+.card > a:hover {
+    background-color: #45a049;
+    color: white;
+}
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -295,9 +293,6 @@ tr:hover {
     margin: 0;
 }
 
-/* =========================
-   PERFIL / USERS
-========================= */
 .profile-actions {
     margin-top: 20px;
     text-align: center;
@@ -308,9 +303,6 @@ tr:hover {
     margin: 5px 10px;
 }
 
-/* =========================
-   RESPONSIVIDADE
-========================= */
 @media (max-width: 768px) {
     .content {
         width: 92%;
