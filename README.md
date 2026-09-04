@@ -1,6 +1,16 @@
 # 📋 Gerenciador de Tarefas — Flask
 
+[![Deploy](https://img.shields.io/badge/deploy-online-brightgreen)](https://projeto-flask-sy86.onrender.com)
+[![Python](https://img.shields.io/badge/python-3.14-blue)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/flask-3.1-black)](https://flask.palletsprojects.com/)
+[![Tests](https://img.shields.io/badge/tests-42%20passing-success)](#-testes-automatizados)
+[![Coverage](https://img.shields.io/badge/coverage-87%25-yellowgreen)](#-testes-automatizados)
+
 Aplicação web de gerenciamento de tarefas com quadro **Kanban**, autenticação de usuários, painel administrativo e API REST autenticada via JWT. Desenvolvida com Flask seguindo boas práticas de arquitetura: Application Factory, Blueprints e camada de Services.
+
+**🔗 Acesse a aplicação ao vivo: [projeto-flask-sy86.onrender.com](https://projeto-flask-sy86.onrender.com)**
+
+> ⚠️ A aplicação está hospedada no plano gratuito do [Render](https://render.com). Se ficar sem acesso por um tempo, o serviço "hiberna" — o primeiro carregamento após um período de inatividade pode levar de 30 a 50 segundos.
 
 ---
 
@@ -33,9 +43,11 @@ Aplicação web de gerenciamento de tarefas com quadro **Kanban**, autenticaçã
 * **Flask-Migrate** (Alembic) — versionamento do banco de dados
 * **Flask-WTF** — proteção CSRF
 * **PyJWT** — autenticação da API
-* **SQLite** (desenvolvimento) / **PostgreSQL-ready** (produção)
+* **PostgreSQL** (produção) / **SQLite** (desenvolvimento)
+* **Gunicorn** — servidor WSGI de produção
 * **Pytest** — testes automatizados
 * **HTML5, CSS3, Jinja2**
+* **Render** — hospedagem (Web Service + PostgreSQL)
 
 ---
 
@@ -82,7 +94,7 @@ O projeto segue o padrão **Application Factory** com separação em camadas:
 
 ---
 
-## ⚙️ Como executar o projeto
+## ⚙️ Como executar o projeto localmente
 
 ### 1. Clonar o repositório
 
@@ -142,6 +154,17 @@ A aplicação estará disponível em `http://localhost:5000`.
 ```bash
 python make_admin.py seuemail@exemplo.com
 ```
+
+---
+
+## ☁️ Deploy
+
+A aplicação está hospedada no **Render**, com dois serviços:
+
+* **Web Service** — executa `flask db upgrade && gunicorn app:app` a cada deploy, aplicando migrations pendentes automaticamente antes de subir o servidor
+* **PostgreSQL** — banco gerenciado, conectado via variável de ambiente `DATABASE_URL`
+
+O deploy é automático: qualquer `git push` na branch `main` dispara um novo build e deploy no Render.
 
 ---
 
